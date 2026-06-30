@@ -1,0 +1,23 @@
+**/out/
+**/~$*
+*.si4project
+*.o
+*.d
+*.elf
+*.bin
+*.hex
+*.map
+
+# Local toolchain and vendor tools are not source.
+/tools/toolchain/
+/tools/programmer/
+/tools/keil/
+/tools/hex2bin/
+/tools/FLM/
+
+# Vendor PDFs are useful locally, but their redistribution license is unclear.
+/Datasheets/*.pdf
+
+.vscode/
+__pycache__/
+

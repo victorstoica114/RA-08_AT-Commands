@@ -79,12 +79,80 @@ The regression covers basic AT commands, error formatting, sleep guards,
 manual-frequency mode (`CHAN=-1`), channel mode, and bidirectional radio
 traffic.
 
+## AT Commands
+
+Commands are sent over UART at `115200 8N1` and are terminated with CRLF.
+Successful commands return `OK`; errors use the `#ERROR: <reason>` format.
+
+Basic commands:
+
+```text
+AT
+AT?
+AT+?
+AT+HELP
+AT+VERSION?
+AT+CFG?
+AT+STATUS?
+AT+DEFAULT
+```
+
+Radio configuration:
+
+```text
+AT+FREQ?
+AT+FREQ=<410000000..525000000>
+AT+CHAN?
+AT+CHAN=<n>
+AT+PWR?
+AT+PWR=<2..22>
+AT+SF?
+AT+SF=<5..12>
+AT+BW?
+AT+BW=<0|1|2|125000|250000|500000>
+AT+CR?
+AT+CR=<1..4|4/5..4/8>
+```
+
+Radio operation and power state:
+
+```text
+AT+RX?
+AT+RX=ON
+AT+RX=OFF
+AT+SEND=<hex>
+AT+LASTPKT?
+AT+SLEEP?
+AT+SLEEP
+AT+WAKE
+```
+
+Useful response formats:
+
+```text
++CFG:FREQ=<hz>,CHAN=<n>,PWR=<dbm>,SF=<sf>,BW=<hz>,CR=<rate>,RX=<ON|OFF>,SLEEP=<0|1>,MAXPL=<bytes>
++STATUS:VERSION=<ver>,FREQ=<hz>,CHAN=<n>,PWR=<dbm>,SF=<sf>,BW=<hz>,CR=<rate>,RX=<ON|OFF>,SLEEP=<0|1>,TXBUSY=<0|1>,LASTPKT=<0|1>
++RX:<rssi>,<snr>,<len>,<hex>
++LASTPKT:<rssi>,<snr>,<len>,<hex>
+```
+
+Notes:
+
+- `AT?` and `AT+?` are aliases for `AT+HELP`.
+- `AT+DEFAULT` restores the safe default config, disables RX, and wakes the
+  radio if it was sleeping.
+- `CHAN=-1` means manual frequency mode set with `AT+FREQ=<Hz>`.
+- `AT+SEND=<hex>` accepts uppercase or lowercase hex, even length only, up to
+  `MAXPL` bytes.
+- Radio-changing commands and TX/RX start commands are guarded while sleeping
+  and return `#ERROR: RADIO_SLEEPING (send AT+WAKE)`.
+
 ## Default Working Config
 
 ```text
 FREQ=433000000
 CHAN=0
-PWR=2
+PWR=14
 SF=7
 BW=125000
 CR=4/5
